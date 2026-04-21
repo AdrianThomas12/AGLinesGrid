@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="GVM.PCF" constructor="AGLinesGrid" version="6.0.4" display-name-key="(Supplier Engagement) AG Lines Grid" description-key="Purchase Order editable grid for child records with AG" control-type="standard" >
+    <external-service-usage enabled="false">
+    </external-service-usage>
+    <data-set name="linesDataset" display-name-key="Lines Dataset" cds-data-set-options="displayCommandBar:false;displayViewSelector:true;displayQuickFindSearch:false">
+    </data-set>
+    <property name="controlId" display-name-key="Control Unique Id" description-key="Unique identifier of the control. Needs to match the id of the Attachments control" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="status" display-name-key="Status of the record" description-key="The status of the main record (PO Header/RFQ Header). OptionSet column binded from the table" of-type="OptionSet" usage="input" required="false" />
+    <property name="status_edited" display-name-key="Status - Edited/Updating value" description-key="The value of the option set as Edited (for PO) or Updating (for RFQ)" of-type="Whole.None" usage="input" required="false" />
+    <property name="recordStatusLogicalName" display-name-key="Record Status Logical Name" description-key="The logical name of the Status column used on the record (po: mserp_responsestate, rfq: mserp_replyprogressstatus etc.)" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="clearCacheProperty" display-name-key="Clear cache field (Date)" description-key="Logical name of any date field on the line table, used for clearing cache on the portal" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerSchemaName" display-name-key="Header Schema Name on Line" description-key="The schema name of the Header on the Line (mserp_FK_...)" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="config" display-name-key="Configuration" description-key="Configuration for the Grid" of-type="Multiple" usage="input" required="true" />
+    <property name="config2" display-name-key="Secondary Configuration" description-key="Secondary configuration for the Grid (optional)" of-type="Multiple" usage="input" required="false" />
+    <property name="searchableColumns" display-name-key="Searchable Columns" description-key="Indicates which columns should be searchable from the Search box on the control (comma separated)" of-type="Multiple" usage="input" required="true" />
+    <property name="alternateLineId" display-name-key="Alternate Line column name" description-key="Logical name of alternate line id for bundling attachments" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="debugMode" display-name-key="Debug Mode" description-key="When enabled, shows a debug panel with raw field values and locale info. Disable in production." of-type="TwoOptions" usage="input" required="false" />
+    <resources>
+      <code path="index.ts" order="1"/>
+      <resx path="strings/AGLinesGrid.1033.resx" version="1.0.0"/>
+    </resources>
+    <feature-usage>
+      <uses-feature name="Utility" required="true" /> 
+      <uses-feature name="WebAPI" required="true" />
+    </feature-usage>
+  </control>
+</manifest>

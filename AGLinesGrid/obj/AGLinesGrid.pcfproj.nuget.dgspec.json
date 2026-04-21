@@ -1,0 +1,94 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\AGLinesGrid.pcfproj": {}
+  },
+  "projects": {
+    "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\AGLinesGrid.pcfproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\AGLinesGrid.pcfproj",
+        "projectName": "AGLinesGrid",
+        "projectPath": "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\AGLinesGrid.pcfproj",
+        "packagesPath": "C:\\Users\\v-valgasenko\\.nuget\\packages\\",
+        "outputPath": "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\obj\\",
+        "projectStyle": "PackageReference",
+        "centralPackageVersionsManagementEnabled": true,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\NuGet.Config",
+          "C:\\Users\\v-valgasenko\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "https://pkgs.dev.azure.com/dynamicscrm/OneCRM/_packaging/VendorRelationshipManagement-Consumption/nuget/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "dependencies": {
+            "Microsoft.PowerApps.MSBuild.Pcf": {
+              "target": "Package",
+              "version": "[1.45.3, )",
+              "versionCentrallyManaged": true
+            }
+          },
+          "centralPackageVersions": {
+            "Azure.Identity": "1.11.4",
+            "Castle.Core": "5.1.1",
+            "Crm.ClientApiTypings": "9.9.9999",
+            "CRM.Skeleton.Testing": "1.0.227",
+            "Dynamics.Solutions.Tools.Targets.AssemblyAutoVersion": "2.0.95",
+            "Dynamics.Solutions.Tools.Targets.ControlManifestAutoVersion": "2.0.95",
+            "Dynamics.Solutions.Tools.Targets.DeploymentPackage": "2.0.95",
+            "Dynamics.Solutions.Tools.Targets.ILRepack": "2.0.95",
+            "Dynamics.Solutions.Tools.Targets.SolutionPackager": "2.0.95",
+            "FluentAssertions": "6.12.0",
+            "Microsoft.CrmSdk.CoreAssemblies": "9.0.2.59",
+            "Microsoft.CrmSdk.Deployment": "9.0.2.34",
+            "Microsoft.CrmSdk.UII.CommonAssemblies": "9.0.2.12",
+            "Microsoft.CrmSdk.Workflow": "9.0.2.52",
+            "Microsoft.CrmSdk.XrmTooling.CoreAssembly": "9.1.1.45",
+            "Microsoft.CrmSdk.XrmTooling.PackageDeployment": "9.1.0.151",
+            "Microsoft.CrmSdk.XrmTooling.PackageDeployment.Core": "9.1.0.151",
+            "Microsoft.Dynamics.OfficeProductivity": "9.0.23091.10001",
+            "Microsoft.NETFramework.ReferenceAssemblies": "1.0.0",
+            "Microsoft.Powerapps.Coreframework.Xrm": "1.19.1.52",
+            "Microsoft.PowerApps.MSBuild.Pcf": "1.45.3",
+            "Microsoft.PowerApps.MSBuild.Plugin": "1.45.3",
+            "Microsoft.PowerApps.MSBuild.Solution": "1.45.3",
+            "Microsoft.Rest.ClientRuntime": "16.0.13823.15010",
+            "MSTest.TestAdapter": "3.3.1",
+            "MSTest.TestFramework": "3.3.1",
+            "Newtonsoft.Json": "13.0.1",
+            "StyleCop.MSBuild": "6.2.0",
+            "System.ComponentModel.Annotations": "5.0.0",
+            "System.Runtime": "4.3.1",
+            "System.Security.Cryptography.Algorithms": "4.3.1",
+            "System.Security.Cryptography.X509Certificates": "4.3.2",
+            "System.Text.Json": "9.0.1"
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.419\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

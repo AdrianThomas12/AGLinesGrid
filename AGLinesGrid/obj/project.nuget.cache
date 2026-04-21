@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "Qk4Zp5FDFVQ=",
+  "success": true,
+  "projectFilePath": "C:\\REPO\\GITHUB\\crm.solutions.vendorrelationshipmanagement\\solutions\\SupplierEngagementControls\\PCFControls\\AGLinesGrid\\AGLinesGrid.pcfproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\v-valgasenko\\.nuget\\packages\\microsoft.powerapps.msbuild.pcf\\1.45.3\\microsoft.powerapps.msbuild.pcf.1.45.3.nupkg.sha512"
+  ],
+  "logs": []
+}
