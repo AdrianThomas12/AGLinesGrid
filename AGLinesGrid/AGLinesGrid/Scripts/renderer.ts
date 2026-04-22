@@ -9,6 +9,7 @@ import { App } from "../Components/App";
 import * as POConfiguration from "./configuration";
 import * as GridWebApi from "./webApi";
 import { IInputs } from "../generated/ManifestTypes";
+import { initFormatters } from "./locale";
 import {
     BooleanOptions,
     ColumnDefinition,
@@ -45,6 +46,7 @@ export class EditableGridRenderer {
         headerEntityName: string,
         config: GridProps
     ) {
+        initFormatters(context.userSettings.numberFormattingInfo);
         const pageNumber = 1;
         const poHeaderSchemaName = context.parameters.headerSchemaName.raw
             ? context.parameters.headerSchemaName.raw
@@ -426,9 +428,10 @@ export class EditableGridRenderer {
                 // number (only digits, commas, dots), use the raw number directly.
                 // This preserves FormattedValue for picklist labels (e.g. "Active"), booleans, etc.
                 const fvIsFormattedNumber = typeof formattedValue === "string" && /^-?[\d,.]+$/.test(formattedValue);
-                row[column] = (typeof rawValue === "number" && !isNaN(rawValue) && fvIsFormattedNumber)
+                const storedValue = (typeof rawValue === "number" && !isNaN(rawValue) && fvIsFormattedNumber)
                     ? rawValue
                     : formattedValue ?? rawValue ?? null;
+                row[column] = storedValue;
             }
         }
 

@@ -3,7 +3,7 @@ import { EditableGridRenderer } from "./Scripts/renderer";
 import { GridProps } from "./Scripts/types";
 import { getPOSpecificConfig } from "./Scripts/configuration";
 
-export class AGLinesGrid implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class AGLinesGridATT implements ComponentFramework.StandardControl<IInputs, IOutputs> {
     private container: HTMLDivElement;
     private renderer: EditableGridRenderer;
     private entityId: string;

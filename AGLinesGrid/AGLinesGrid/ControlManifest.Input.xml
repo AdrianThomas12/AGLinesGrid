@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="GVM.PCF" constructor="AGLinesGrid" version="6.0.4" display-name-key="(Supplier Engagement) AG Lines Grid" description-key="Purchase Order editable grid for child records with AG" control-type="standard" >
+  <control namespace="GVM.PCF" constructor="AGLinesGridATT" version="6.0.40" display-name-key="(Supplier Engagement) AG Lines Grid ATT" description-key="Purchase Order editable grid for child records with AG" control-type="standard" >
     <external-service-usage enabled="false">
     </external-service-usage>
     <data-set name="linesDataset" display-name-key="Lines Dataset" cds-data-set-options="displayCommandBar:false;displayViewSelector:true;displayQuickFindSearch:false">

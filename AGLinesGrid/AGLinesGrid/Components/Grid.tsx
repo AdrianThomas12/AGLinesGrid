@@ -200,27 +200,27 @@ function getGridColumns(
                           );
                       }
                     : (props: any) => {
+                          const _cellValue =
+                              typeof props.value === "object"
+                                  ? props.value instanceof Date
+                                      ? props.value
+                                      : props.value?.name ?? ""
+                                  : props.value;
+                          const _valueBefore =
+                              (cd as any).showOriginalValueTooltip &&
+                              retrievedRowData &&
+                              retrievedRowData?.[props.node.rowIndex]?.[
+                                  props.colDef.fieldOriginalValue ?? props.colDef.field
+                              ];
                           return (
                               <TooltipTextCell
-                                  value={
-                                      typeof props.value === "object"
-                                          ? props.value instanceof Date
-                                              ? props.value
-                                              : props.value?.name ?? ""
-                                          : props.value
-                                  }
+                                  value={_cellValue}
                                   originalValueText={
                                       attributesMetadata.find(m => m.LogicalName === cd.fieldOriginalValue)?.DisplayName
                                           ?.UserLocalizedLabel?.Label ?? getString("OriginalValue")
                                   }
                                   valueFormatted={props.valueFormatted}
-                                  valueBefore={
-                                      (cd as any).showOriginalValueTooltip &&
-                                      retrievedRowData &&
-                                      retrievedRowData?.[props.node.rowIndex]?.[
-                                          props.colDef.fieldOriginalValue ?? props.colDef.field
-                                      ]
-                                  }
+                                  valueBefore={_valueBefore}
                                   dataType={cd.dataType}
                               />
                           );
@@ -281,6 +281,11 @@ function getGridColumns(
                               },
                               selectedValue: params?.data?.[cd.field]
                           } as LookupProps)
+                        : cd.dataType === "decimal" ||
+                          cd.dataType === "double" ||
+                          cd.dataType === "money" ||
+                          cd.dataType === "integer"
+                        ? { useFormatter: true }
                         : {
                               values: cd.options?.map(o => o.label)
                           };
@@ -321,14 +326,17 @@ function getGridColumns(
                             ? parseInt(params.data?.[cd.field]).toString()
                             : params.data?.[cd.field].toString();
 
-                    if (cd.dataType === "decimal" || cd.dataType === "double" || cd.dataType === "money")
-                        return typeof params.data?.[cd.field] === "string"
+                    if (cd.dataType === "decimal" || cd.dataType === "double" || cd.dataType === "money") {
+                        const rawInGrid = params.data?.[cd.field];
+                        const result = typeof rawInGrid === "string"
                             ? cd.convertToInteger
-                                ? parseFloat(params.data?.[cd.field]).toFixed(0)
-                                : parseFloat(params.data?.[cd.field]).toFixed(2)
+                                ? parseFloat(rawInGrid).toFixed(0)
+                                : parseFloat(rawInGrid).toFixed(2)
                             : cd.convertToInteger
-                            ? params.data?.[cd.field].toFixed(0)
-                            : params.data?.[cd.field].toFixed(2);
+                            ? rawInGrid?.toFixed(0)
+                            : rawInGrid?.toFixed(2);
+                        return result;
+                    }
 
                     if (cd.dataType === "lookup") {
                         return params.data?.[cd.field] ?? null;
@@ -345,7 +353,6 @@ function getGridColumns(
                         const rawField = params.data[cd.field];
                         const oldValue = typeof rawField === "number" ? rawField : parseFloat(String(rawField ?? ""));
                         const newValue = typeof params.newValue === "number" ? params.newValue : parseUserInput(String(params.newValue ?? ""));
-
                         if (!isNaN(newValue) && oldValue !== newValue) {
                             params.data[cd.field] = newValue;
                             return true;
@@ -980,8 +987,10 @@ export const Grid = (props: GridProps) => {
             convertRowData.dataverseToGridApp(row, retrievedColDefs);
         }
 
+        const newSnapshot = retrievedRows.data.map(r => ({ ...r }));
+
         setRetrievedColDefs(retrievedColDefs);
-        setRetrievedRowData(retrievedRows.data.map(r => ({ ...r })));
+        setRetrievedRowData(newSnapshot);
         setRowData(retrievedRows.data);
         setTotalPages(Math.ceil(retrievedRows.totalRecordCount / 10));
         setLoading(false);

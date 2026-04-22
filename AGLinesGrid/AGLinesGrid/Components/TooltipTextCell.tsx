@@ -45,8 +45,8 @@ export const TooltipTextCell = (props: {
         return props.valueFormatted ?? props.value;
     }, [props.valueFormatted, props.value]);
 
-    const showOriginalValue = React.useMemo(() => {
-        if (props.valueBefore && props.valueBefore instanceof Date && props.value instanceof Date)
+    const showOriginalValue = React.useMemo((): boolean => {
+        if (props.valueBefore != null && props.valueBefore instanceof Date && props.value instanceof Date)
             return props.value.getTime() !== props.valueBefore.getTime();
 
         if (
@@ -56,11 +56,11 @@ export const TooltipTextCell = (props: {
             props.dataType === "money"
         )
             return (
-                props.valueBefore &&
+                props.valueBefore != null &&
                 parseFloat(String(props.valueBefore)) !== parseFloat(String(props.value))
             );
 
-        return props.valueBefore && props.value !== props.valueBefore;
+        return props.valueBefore != null && props.value !== props.valueBefore;
     }, [props.valueBefore, props.value]);
 
     /**

@@ -15,6 +15,30 @@ type UserTimezone = {
     iana: string; // e.g. "Asia/Beirut"
 };
 
+type NumberFormatOverride = {
+    decimalSeparator: string;
+    groupSeparator: string;
+};
+
+let pcfNumberFormat: NumberFormatOverride | null = null;
+
+/**
+ * Pre-initialises number formatters using the PCF context's NumberFormattingInfo.
+ * Call this from renderer.ts before ReactDOM.render so the correct D365 user separators
+ * are used instead of falling back to navigator.language.
+ */
+export function initFormatters(numberFormattingInfo: {
+    numberDecimalSeparator: string;
+    numberGroupSeparator: string;
+}) {
+    const decSep = numberFormattingInfo.numberDecimalSeparator;
+    const grpSep = numberFormattingInfo.numberGroupSeparator;
+    if (pcfNumberFormat?.decimalSeparator !== decSep || pcfNumberFormat?.groupSeparator !== grpSep) {
+        pcfNumberFormat = { decimalSeparator: decSep, groupSeparator: grpSep };
+        cachedFormatters = null; // Invalidate cache so next buildFormatters() rebuilds with new separators
+    }
+}
+
 function getPortalLocale() {
     const lang =
         (window as any)?.msdyn?.Portal?.Snippets?.userLanguage ||
@@ -78,6 +102,16 @@ export function buildFormatters() {
     if (cachedFormatters) return cachedFormatters;
     const { locale, timeZone, datePattern, timePattern, lang } = getPortalLocale();
 
+    // Separators: PCF context (most accurate) > portal lang snippets > Intl locale detection
+    const decSep =
+        pcfNumberFormat?.decimalSeparator ??
+        lang?.decimal_separator?.trim() ??
+        new Intl.NumberFormat(locale, { minimumFractionDigits: 1 }).format(1.1)[1];
+    const grpSep =
+        pcfNumberFormat?.groupSeparator ??
+        lang?.thousand_separator?.trim() ??
+        new Intl.NumberFormat(locale, { useGrouping: true }).format(1111)[1];
+
     const dateFmt = new Intl.DateTimeFormat(locale, { timeZone, ...patternToDateOptions(datePattern) });
     const timeFmt = new Intl.DateTimeFormat(locale, { timeZone, ...patternToTimeOptions(timePattern) });
     const dateTimeFmt = new Intl.DateTimeFormat(locale, {
@@ -86,10 +120,16 @@ export function buildFormatters() {
         ...patternToTimeOptions(timePattern)
     });
 
-    // generic number formatters (optional, but nice)
-    const intFmt = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 });
-    const decFmt = (fractionDigits = 2) =>
-        new Intl.NumberFormat(locale, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
+    // Format a number using the resolved separators, bypassing Intl.NumberFormat locale guessing.
+    function formatNum(n: number, digits: number): string {
+        if (!isFinite(n)) return String(n);
+        const isNeg = n < 0;
+        const fixed = Math.abs(n).toFixed(digits);
+        const [intPart, fracPart] = fixed.split(".");
+        const intFormatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, grpSep);
+        const result = digits > 0 ? `${intFormatted}${decSep}${fracPart}` : intFormatted;
+        return isNeg ? `-${result}` : result;
+    }
 
     cachedFormatters = {
         formatDate: (d: Date | string | null | undefined) => {
@@ -107,61 +147,50 @@ export function buildFormatters() {
             const dt = d instanceof Date ? d : new Date(d);
             return isNaN(dt.getTime()) ? "" : dateTimeFmt.format(dt);
         },
-        formatInteger: (n: any) => (n == null || n === "" || isNaN(Number(n)) ? "" : intFmt.format(Number(n))),
+        formatInteger: (n: any) =>
+            n == null || n === "" || isNaN(Number(n)) ? "" : formatNum(Math.round(Number(n)), 0),
         formatDecimal: (n: any, digits = 2) =>
-            n == null || n === "" || isNaN(Number(n)) ? "" : decFmt(digits).format(Number(n)),
+            n == null || n === "" || isNaN(Number(n)) ? "" : formatNum(Number(n), digits),
         parseDecimal: (val: string | number | null | undefined): number => {
             if (val == null || val === "") return 0;
             if (typeof val === "number") return isNaN(val) ? 0 : val;
-            const groupingSep =
-                lang?.thousand_separator?.trim() ??
-                new Intl.NumberFormat(locale, { useGrouping: true }).format(1111)[1];
-            const decimalSep =
-                lang?.decimal_separator?.trim() ??
-                new Intl.NumberFormat(locale, { minimumFractionDigits: 1 }).format(1.1)[1];
-            const stripped = String(val).replaceAll(groupingSep, "").replace(decimalSep, ".");
+            const stripped = String(val).replaceAll(grpSep, "").replace(decSep, ".");
             const n = parseFloat(stripped);
             return isNaN(n) ? 0 : n;
         },
         parseUserInput: (val: string): number => {
             if (!val || val.trim() === "") return NaN;
-            // Strip spaces (\u00A0 = Finnish/French/Swedish) and apostrophes (Swiss) — these are thousands separators only
+            // Strip spaces (\u00A0 = Finnish/French/Swedish) and apostrophes (Swiss) first
             const s = val.trim().replace(/[\s\u00A0']/g, "");
+            if (!s) return NaN;
+
             const hasDot = s.includes(".");
             const hasComma = s.includes(",");
 
+            // When both separators are present the last one is unambiguously the decimal
             if (hasDot && hasComma) {
                 const lastDot = s.lastIndexOf(".");
                 const lastComma = s.lastIndexOf(",");
                 if (lastDot > lastComma) {
-                    // dot is decimal: "1,000.53"
-                    return parseFloat(s.replaceAll(",", ""));
+                    return parseFloat(s.replaceAll(",", ""));         // dot is decimal: "1,000.53"
                 } else {
-                    // comma is decimal: "1.000,53"
-                    return parseFloat(s.replaceAll(".", "").replace(",", "."));
+                    return parseFloat(s.replaceAll(".", "").replace(",", ".")); // comma is decimal: "1.000,53"
                 }
             }
+
+            // Single separator — use resolved grpSep to decide
             if (hasDot) {
-                // Only dots — check if every segment after splitting by "." is numeric and the last is exactly 3 digits
-                const segments = s.split(".");
-                const lastSeg = segments[segments.length - 1];
-                if (/^\d{3}$/.test(lastSeg) && segments.slice(0, -1).every(seg => /^\d+$/.test(seg))) {
-                    // German thousands: "1.000" → 1000, "1.000.000" → 1000000
-                    return parseFloat(s.replaceAll(".", ""));
+                if (grpSep === ".") {
+                    return parseFloat(s.replaceAll(".", "")); // dot is thousands in this locale
                 } else {
-                    // Decimal: "0.53", "1.5"
-                    return parseFloat(s);
+                    return parseFloat(s);                     // dot is decimal in this locale
                 }
             }
             if (hasComma) {
-                const segments = s.split(",");
-                const lastSeg = segments[segments.length - 1];
-                if (/^\d{3}$/.test(lastSeg) && segments.slice(0, -1).every(seg => /^\d+$/.test(seg))) {
-                    // en-US thousands: "1,000" → 1000
-                    return parseFloat(s.replaceAll(",", ""));
+                if (grpSep === ",") {
+                    return parseFloat(s.replaceAll(",", "")); // comma is thousands in this locale
                 } else {
-                    // German decimal: "0,53"
-                    return parseFloat(s.replace(",", "."));
+                    return parseFloat(s.replace(",", "."));   // comma is decimal in this locale
                 }
             }
             return parseFloat(s);
